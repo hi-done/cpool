@@ -1,5 +1,6 @@
 # cpool
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/hi-done/cpool.svg)](https://pkg.go.dev/github.com/hi-done/cpool)
 [![Go Version](https://img.shields.io/badge/Go-%3E%3D1.26.5-blue.svg)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
