@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false   # ← 纯库不需要缓存 Go modules，关掉防止 warning
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -v -race ./...
+
+  notify-pkg-go-dev:
+    # 只在打 tag 时跑，PR 和普通 push 跳过
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping proxy.golang.org
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          echo "Notifying pkg.go.dev for version $VERSION"
+          curl -sSf "https://proxy.golang.org/github.com/hi-done/cpool/@v/$VERSION.info" \
+            || echo "proxy returned non-zero, but that's ok"
